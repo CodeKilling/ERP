@@ -1,0 +1,162 @@
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.erp.root.mybatis.stock.StockMapper">
+	<resultMap id="stock" type="com.erp.root.stock.dto.StockDTO" >
+		<!-- property : dto / column : database column -->
+		<id property="stockNo" column="stock_no"/>
+		<result property="rowNo" column="row_no"/>
+		<result property="name" column="name"/>
+		<result property="comments" column="comments"/>
+		<result property="stockDay" column="stock_day"/>
+		<result property="productNo" column="product_no"/>
+		<result property="productName" column="product_name"/>
+		<result property="count" column="count"/>
+		<result property="confirm" column="confirm"/>
+		<result property="accountNo" column="account_no"/>
+		<result property="accountName" column="account_name"/>
+	</resultMap>
+	<resultMap id="product" type="com.erp.root.stock.dto.StockProductDTO" >
+		<!-- property : dto / column : database column -->
+		<id property="spNo" column="product_no"/>
+		<result property="spName" column="name"/>
+	</resultMap>
+	<resultMap id="account" type="com.erp.root.stock.dto.StockAccountDTO" >
+		<!-- property : dto / column : database column -->
+		<id property="saNo" column="account_no"/>
+		<result property="saName" column="name"/>
+	</resultMap>
+	
+	<select id="getStockProductList" resultMap="product">
+		select product_no, name
+		from erp_product
+	</select>
+	
+	<select id="getStockAccountList" resultMap="account">
+		select account_no, name
+		from erp_account
+	</select>
+	
+	<!-- <insert id="stockInsert">
+		insert into erp_stock(
+			STOCK_NO,
+			NAME,
+			COMMENTS,
+			STOCK_DAY,
+			CONFIRM,
+			PRODUCT_NO,
+			ACCOUNT_NO,
+			COUNT)
+		values(
+			seq_erp_stock.nextval,
+			#{name},			
+			#{comments},
+			#{stockDay},
+			#{confirm},
+			#{productNo},
+			#{accountNo},
+			#{count} )
+	</insert> -->
+	<resultMap id="stockInsert" type="hashmap"></resultMap>
+	<insert id="stockInsert" statementType="CALLABLE">
+		{
+			call proc_insert_stock(
+				#{name},
+				#{comments},
+				#{stockDay},
+				#{confirm},
+				#{productNo},
+				#{accountNo},
+				#{count}
+			)
+		}
+	</insert>
+	
+	<resultMap id="stockModify" type="hashmap"></resultMap>
+	<update id="stockModify" statementType="CALLABLE">
+		{
+			call proc_modify_stock(
+				#{stockNo},
+				#{name},
+				#{comments},
+				#{stockDay},
+				#{confirm},
+				#{productNo},
+				#{accountNo},
+				#{count},
+				#{originCount}
+			)
+		}
+	</update>
+	
+	<resultMap id="stockDelete" type="hashmap"></resultMap>
+	<delete id="stockDelete" statementType="CALLABLE">
+		{
+			call proc_delete_stock(
+				#{stockNo},
+				#{productNo},
+				#{count}
+			)
+		}
+	</delete>
+	
+	<select id="selectStockCount" resultType="int">
+		select count(*) from erp_stock
+	</select>
+	
+	<select id="stockList" resultMap="stock">
+		select * from(
+		    select rownum as row_no,
+                   a.*
+        	from(select erp_stock.stock_no,
+	                    erp_stock.name as name,
+			           	erp_stock.comments,
+			           	erp_stock.stock_day,
+			           	erp_stock.confirm,
+			           	erp_stock.product_no,
+			           	erp_product.name as product_name,
+			           	erp_stock.account_no,
+			           	erp_account.name as account_name,
+			           	erp_stock.count
+		    	 from erp_stock, erp_product, erp_account
+		    	 where erp_product.product_no = erp_stock.product_no
+	      		 and erp_account.account_no = erp_stock.account_no
+		    	 order by erp_stock.stock_no)a)
+		where row_no between #{start} and #{end}
+	</select>
+	
+	<select id="getStockInfo" resultMap="stock">
+		select erp_stock.stock_no,
+	           erp_stock.name as name,
+	           erp_stock.comments,
+	           erp_stock.stock_day,
+	           erp_stock.confirm,
+	           erp_stock.product_no,
+	           erp_product.name as product_name,
+	           erp_stock.account_no,
+	           erp_account.name as account_name,
+	           erp_stock.count
+	    from erp_stock, erp_product, erp_account
+	    where erp_product.product_no = erp_stock.product_no
+	      and erp_account.account_no = erp_stock.account_no
+          and erp_stock.stock_no = #{stockNo}
+	    order by erp_stock.stock_no
+	</select>
+	
+	<!-- <update id="stockModify">
+		update erp_stock set
+			NAME = #{name},
+			COMMENTS = #{comments},
+			STOCK_DAY = #{stockDay},
+			CONFIRM = #{confirm},
+			PRODUCT_NO = #{productNo},
+			ACCOUNT_NO = #{accountNo},
+			COUNT = #{count}
+		where erp_stock.stock_no = #{stockNo}
+	</update> -->
+	
+	<!-- <delete id="stockDelete">
+		delete from erp_stock where erp_stock.stock_no = #{stockNo}
+	</delete> -->
+</mapper>

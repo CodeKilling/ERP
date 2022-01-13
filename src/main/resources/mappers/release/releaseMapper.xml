@@ -1,0 +1,204 @@
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.erp.root.mybatis.release.ReleaseMapper">
+	<resultMap id="release" type="com.erp.root.release.dto.ReleaseDTO" >
+		<!-- property : dto / column : database column -->
+		<id property="releaseNo" column="release_no"/>
+		<result property="rowNo" column="row_no"/>
+		<result property="name" column="name"/>
+		<result property="comments" column="comments"/>
+		<result property="releaseDay" column="release_day"/>
+		<result property="productNo" column="product_no"/>
+		<result property="productName" column="product_name"/>
+		<result property="count" column="count"/>
+		<result property="accountNo" column="account_no"/>
+		<result property="accountName" column="account_name"/>
+		<result property="totalCount" column="total_count"/>
+	</resultMap>
+	<resultMap id="product" type="com.erp.root.release.dto.ReleaseProductDTO" >
+		<!-- property : dto / column : database column -->
+		<id property="rpNo" column="product_no"/>
+		<result property="rpName" column="name"/>
+	</resultMap>
+	<resultMap id="account" type="com.erp.root.release.dto.ReleaseAccountDTO" >
+		<!-- property : dto / column : database column -->
+		<id property="raNo" column="account_no"/>
+		<result property="raName" column="name"/>
+	</resultMap>
+	<resultMap id="stock" type="com.erp.root.stock.dto.StockDTO" >
+		<!-- property : dto / column : database column -->
+		<id property="stockNo" column="stock_no"/>
+		<result property="rowNo" column="row_no"/>
+		<result property="name" column="name"/>
+		<result property="comments" column="comments"/>
+		<result property="stockDay" column="stock_day"/>
+		<result property="productNo" column="product_no"/>
+		<result property="productName" column="product_name"/>
+		<result property="count" column="count"/>
+		<result property="confirm" column="confirm"/>
+		<result property="accountNo" column="account_no"/>
+		<result property="accountName" column="account_name"/>
+		<result property="totalCount" column="total_count"/>
+	</resultMap>
+	
+	<select id="selectReleaseCount" resultType="int">
+		select count(*) from erp_release
+	</select>
+	
+	<select id="releaseList" resultMap="release">
+		select *
+		from
+		    (select rownum as row_no, a.*
+		        from
+		            (select
+		                release.release_no,
+		                release.name,
+		                release.comments,
+		                release.release_day,
+		                release.product_no,
+		                release.confirm,
+		                product.name as product_name,
+		                release.account_no,
+		                account.name as account_name,
+		                release.count
+		            from 
+		                erp_release release,
+		                erp_product product,
+		                erp_account account
+		            where
+		                product.product_no = release.product_no and
+		                account.account_no = release.account_no
+		            order by release.release_no) a)
+		where row_no between #{start} and #{end}    
+	</select>
+	
+	<select id="selectPreDataCount" resultType="int">
+		select count(*)
+		from
+    		erp_stock 
+	</select>
+	
+	<select id="preData" resultMap="stock">
+		select *
+		from
+		(select rownum as row_no,
+		        a.*
+		    from    
+		        (select 
+		            stock.stock_no,
+		            stock.name,
+		            stock.comments,
+		            stock.stock_day,
+		            stock.product_no,
+		            product.name as product_name,
+		            stock.account_no,
+		            account.name as account_name,
+		            <!-- stock.count -->
+		            product.total as count
+		            from 
+		                erp_stock stock,
+		                erp_product product,
+		                erp_account account
+		            where stock.confirm = 'true'
+		            and product.product_no = stock.product_no
+		            and account.account_no = stock.account_no
+		            order by stock.stock_no) a)
+		where row_no BETWEEN #{start} and #{end}
+	</select>
+	
+	<select id="getReleaseProductList" resultMap="product">
+		select product_no, name
+		from erp_product
+	</select>
+	
+	<select id="getReleaseAccountList" resultMap="account">
+		select account_no, name
+		from erp_account
+	</select>
+	
+	<resultMap id="releaseInsert" type="hashmap"></resultMap>
+	<insert id="releaseInsert" statementType="CALLABLE">
+		{
+			call proc_insert_release(
+				#{name},
+				#{comments},
+				#{releaseDay},
+				#{productNo},
+				#{accountNo},
+				#{count}
+			)
+		}
+	</insert>
+	
+	<select id="getStockInfo" resultMap="stock">
+		select
+		    stock.stock_no,
+		    stock.name,
+		    stock.comments,
+		    stock.stock_day,
+		    stock.product_no,
+		    product.name as product_name,
+		    stock.account_no,
+		    account.name as account_name,
+		    stock.count,
+		    product.total as total_count
+		from erp_stock stock,
+		    erp_product product,
+		    erp_account account
+		where stock.confirm = 'true'
+		and product.product_no = stock.product_no
+		and account.account_no = stock.account_no
+		and stock.stock_no = #{stockNo}
+		order by stock.stock_no
+	</select>
+	
+	<select id="getReleaseInfo" resultMap="release">
+		select
+		    release.release_no,
+		    release.name,
+		    release.comments,
+		    release.release_day,
+		    release.product_no,
+		    product.name as product_name,
+		    release.account_no,
+		    account.name as account_name,
+		    release.count,
+		    product.total as total_count
+		from 
+	        erp_release release,
+	        erp_product product,
+	        erp_account account
+		where release.release_no = #{releaseNo} 
+		and product.product_no = release.product_no
+		and account.account_no = release.account_no
+		order by release.release_no
+	</select>
+	
+	<resultMap id="releaseModify" type="hashmap"></resultMap>
+	<update id="releaseModify" statementType="CALLABLE">
+		{
+			call proc_modify_release(
+				#{releaseNo},
+				#{releaseDay},
+				#{productNo},
+				#{confirm},
+				#{count},
+				#{originCount}
+			)
+		}
+	</update>
+	
+	<resultMap id="releaseDelete" type="hashmap"></resultMap>
+	<delete id="releaseDelete" statementType="CALLABLE">
+		{
+			call proc_delete_release(
+				#{releaseNo},
+				#{productNo},
+				#{count}
+			)
+		}
+	</delete>
+	
+</mapper>

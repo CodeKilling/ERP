@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.erp.root.mybatis.product.ProductMapper">
+	<resultMap id="product" type="com.erp.root.product.dto.ProductDTO" >
+		<!-- property : dto / column : database column -->
+		<id property="productno" column="product_no"/>
+		<result property="rowno" column="rowno"/>
+		<result property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="category" column="category"/>
+		<!-- <result property="accountNo" column="account_no"/>
+		<result property="accountName" column="account_name"/> -->
+		<result property="imageFileName" column="image_file_name"/>
+	</resultMap>
+	<resultMap id="category" type="com.erp.root.product.dto.CategoryDTO" >
+		<!-- property : dto / column : database column -->
+		<id property="id" column="id"/>
+		<result property="category" column="category"/>
+	</resultMap>
+	<resultMap id="account" type="com.erp.root.product.dto.AccountDTO" >
+		<!-- property : dto / column : database column -->
+		<id property="accountNo" column="account_no"/>
+		<result property="accountName" column="account_name"/>
+	</resultMap>
+	
+	<select id="selectProductCount" resultType="int">
+		select count(*) from erp_product
+	</select>
+	
+	<select id="productList" resultMap="product">
+		select * from
+			(select 
+				rownum as rowno,
+			    a.* 
+			from(select
+					product.product_no,
+					product.id,
+					product.name,
+					product.category,
+					<!-- product.account_no,
+					account.name as account_name, -->
+					product.image_file_name
+				from erp_product product<!-- , erp_account account -->
+				<!-- where account.account_no = product.account_no -->
+				order by product.product_no)a)
+		where rowno between #{start} and #{end}
+	</select>
+	
+	<insert id="productInsert">
+		insert into erp_product(
+			product_no,
+			id,
+			name,
+			category,
+			<!-- account_no, -->
+			image_file_name)
+			values(
+			seq_erp_product.nextval,
+			#{id},
+			#{name},
+			#{category},
+			<!-- #{accountNo}, -->
+			#{imageFileName})
+	</insert>
+	
+	<select id="productInfo" resultMap="product">
+		select
+		    product.product_no,
+		    product.id,
+		    product.name,
+		    product.category,
+		    <!-- product.account_no,
+		    account.name as account_name, -->
+		    product.image_file_name
+		from erp_product product<!-- , erp_account account -->
+		where product.product_no = #{productno}
+		<!-- and account.account_no = product.account_no -->
+		order by product.product_no
+	</select>
+	
+	<update id="productModify">
+		update erp_product set
+			id = #{id},
+			name = #{name},
+			category = #{category},
+			<!-- account_no = #{accountNo}, -->
+			image_file_name = #{imageFileName}
+		where product_no = #{productno}
+	</update>
+	
+	<delete id="productDelete">
+		delete from erp_product
+		where product_no = #{productno}
+	</delete>
+	
+	<select id="productCategory" resultType="String">
+		select distinct category
+		from erp_product
+	</select>
+	
+	<select id="getCategory" resultMap="category">
+		select * from erp_category order by id
+	</select>
+	
+	<select id="getAccount" resultMap="account">
+		select
+		    account.account_no as account_no,
+		    account.name as account_name
+		from erp_account account
+		order by account.account_no
+	</select>
+	
+	<select id="productFilterList" resultMap="product">
+		select * from
+			(select
+				product_no,
+				rownum as rowno,
+				id,
+				name,
+				category,
+				image_file_name
+			from erp_product 
+			where category = #{category}
+			order by product_no)
+		where rowno between #{start} and #{end}
+	</select>
+</mapper>

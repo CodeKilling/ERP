@@ -1,0 +1,29 @@
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.erp.root.mybatis.inventory.InventoryMapper">
+	<resultMap id="inventory" type="com.erp.root.inventory.dto.InventoryDTO" >
+		<!-- property : dto / column : database column -->
+		<result property="rowNo" column="row_no"/>
+		<result property="productNo" column="product_no"/>
+		<result property="id" column="id"/>
+		<result property="productName" column="product_name"/>
+		<result property="category" column="category"/>
+		<result property="productTotal" column="product_total"/>
+		<result property="accountNo" column="account_no"/>
+		<result property="accountName" column="account_name"/>
+		<result property="contact" column="contact"/>
+		<result property="warehouseTotal" column="warehouse_total"/>
+	</resultMap>
+
+	<select id="selectInventoryCount" resultType="int">
+		select count(*) from view_total
+	</select>
+	
+	<select id="inventoryStatus" resultMap="inventory">
+		select * from view_total
+		where row_no between #{start} and #{end}
+	</select>
+
+</mapper>

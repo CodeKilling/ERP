@@ -1,0 +1,10 @@
+.right .content .radio{
+	width: 20px;
+	height: auto;
+	box-sizing: border-box;
+}
+.right .content .label{
+	width: 77px;
+	height: 17.33px;
+	box-sizing: border-box;
+}

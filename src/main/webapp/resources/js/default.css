@@ -1,0 +1,53 @@
+* {
+	margin: 0;
+}
+.top {
+	width: 1920px;
+	height: 113px; 
+	float: left;
+	box-sizing : border-box;
+	margin: auto;
+}
+.left {
+	width: 10%;
+	height: 904.33px;
+	float: left;
+	box-sizing: border-box;
+	background-color: black;
+	/* border-right:10px solid white; */
+}
+
+.right {
+	width: 90%;
+	height: 904.33px;
+	float: right;
+	box-sizing: border-box;
+	background-color: black;
+	color: white;
+}
+
+.right i {
+	color: white;
+	font-family: Gabriola;
+	font-size: 30px;
+}
+
+.right .divmain {
+	width: 500px;
+	margin: auto;
+	margin-top: 200px;
+}
+
+.right .divname {
+	width: 500px;
+	margin: auto;
+	text-align: right;
+}
+
+.bottom {
+	width: 1920px;
+	height: 62.67px;
+	float: left;
+	box-sizing: border-box;
+	margin: auto;
+}

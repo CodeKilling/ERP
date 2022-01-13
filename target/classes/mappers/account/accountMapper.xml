@@ -1,0 +1,59 @@
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.erp.root.mybatis.account.AccountMapper">
+	<resultMap id="account" type="com.erp.root.account.dto.AccountDTO" >
+		<!-- property : dto / column : database column -->
+		<id property="accountNo" column="account_no"/>
+		<result property="rowNo" column="row_no"/>
+		<result property="name" column="name"/>
+		<result property="contact" column="contact"/>
+		<result property="addr" column="address"/>
+	</resultMap>
+	
+	<select id="selectAccountCount" resultType="int">
+		select count(*) from erp_account
+	</select>
+	
+	<select id="accountList" resultMap="account">
+		select * from
+			(select
+				account_no,
+				rownum as row_no,
+				name,
+				contact,
+				address
+			from erp_account order by account_no)
+		where row_no between #{start} and #{end}
+	</select>
+	
+	<insert id="accountInsert">
+		insert into erp_account(
+			account_no,
+			name,
+			contact,
+			address) 
+			values(
+			seq_erp_account.nextval,
+			#{name},
+			#{contact},
+			#{addr})
+	</insert>
+	
+	<select id="accountInfo" resultMap="account">
+		select * from erp_account where account_no = #{accountNo}
+	</select>
+	
+	<update id="accountModify">
+		update erp_account set
+			name = #{name},
+			contact = #{contact},
+			address = #{addr}
+		where account_no = #{accountNo}
+	</update>
+	
+	<delete id="accountDelete">
+		delete from erp_account where account_no = #{accountNo}
+	</delete>
+</mapper>

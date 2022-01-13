@@ -1,0 +1,39 @@
+input[type="date"]::-webkit-calendar-picker-indicator {
+    color: none;
+    opacity: 1;
+    display: block;
+    background: orange;
+    width: 70px;
+    height: 20px;
+    border-width: thin;
+    cursor: pointer;
+}
+
+#date-picker{
+	position: absolute;
+	width: 1px; 
+	height: 1px; 
+	padding: 0; 
+	margin: -1px; 
+	overflow: hidden; 
+	clip:rect(0,0,0,0); 
+	border: 0;
+}
+
+#date-label{
+	display: inline-block;
+	width: 200px;
+	background-color: black;
+	color: white;
+	padding: 0;
+	border-width: 0;
+	border: 1px solid white;
+	box-sizing: border-box;
+	border-radius: 20px;
+	text-align: center;
+	cursor: pointer;
+}
+
+#date-label:hover {
+	color: orange;
+}

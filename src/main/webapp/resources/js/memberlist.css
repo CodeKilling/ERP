@@ -1,0 +1,37 @@
+.content {
+	min-width: 500px;
+	width: auto;
+}
+
+table {
+    border: 1px solid white;
+    border-collapse: collapse;
+    min-width: 500px;
+    text-align: center;
+    margin: auto;
+    width: max-content;
+}
+
+th, td {
+    border: 1px solid white;
+}
+
+.th1{
+	width: 100px;
+}
+
+a {
+	text-decoration: none;
+	color: white;
+}
+
+a:link {
+	color: white;
+}
+a:visited {
+	color: white;
+}
+a:hover {
+	color: orange;
+	cursor: pointer;
+}
